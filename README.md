@@ -27,6 +27,12 @@ export MYSQL_DATABASE=mydb
 npx @suprim/mysql-mcp
 ```
 
+## Claude Code
+
+```bash
+claude mcp add mysql-mcp -- npx -y @suprim/mysql-mcp --env-file .env
+```
+
 ## Claude Desktop Configuration
 
 Add to your `claude_desktop_config.json`:
