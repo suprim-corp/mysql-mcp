@@ -5,7 +5,7 @@
 	"license": "MIT",
 	"type": "module",
 	"bin": {
-		"mysql-mcp": "./dist/index.js"
+		"mysql-mcp": "dist/index.js"
 	},
 	"main": "./dist/server.js",
 	"files": [
