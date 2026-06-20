@@ -3,23 +3,29 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { AppConfig } from "../config/index.js";
 import { getPool } from "../db/pool.js";
 
-export function registerGetTableName(
+export function registerDescribeTables(
     server: McpServer,
     config: AppConfig,
 ): void {
     server.tool(
-        "get_table_name",
-        "Search for tables by comment/description keyword. Returns matching table names and their comments.",
-        { keyword: z.string().describe("Keyword to search in table comments") },
-        async ({ keyword }) => {
+        "describe_tables",
+        "Get column structure for one or more tables (name, type, nullable, default, comment).",
+        { tables: z.string().describe("Comma-separated table names") },
+        async ({ tables }) => {
             try {
                 const pool = getPool();
+                const tableNames = tables
+                    .split(",")
+                    .map((t) => t.trim())
+                    .filter(Boolean);
+                const placeholders = tableNames.map(() => "?").join(",");
+
                 const [rows] = await pool.query(
-                    `SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_COMMENT
-           FROM information_schema.TABLES
-           WHERE TABLE_SCHEMA = ? AND TABLE_COMMENT LIKE ?
-           ORDER BY TABLE_NAME`,
-                    [config.db.database, `%${keyword}%`],
+                    `SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_COMMENT, ORDINAL_POSITION
+           FROM information_schema.COLUMNS
+           WHERE TABLE_SCHEMA = ? AND TABLE_NAME IN (${placeholders})
+           ORDER BY TABLE_NAME, ORDINAL_POSITION`,
+                    [config.db.database, ...tableNames],
                 );
 
                 return {

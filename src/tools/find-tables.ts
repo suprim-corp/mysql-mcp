@@ -3,29 +3,23 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { AppConfig } from "../config/index.js";
 import { getPool } from "../db/pool.js";
 
-export function registerGetTableIndex(
+export function registerFindTables(
     server: McpServer,
     config: AppConfig,
 ): void {
     server.tool(
-        "get_table_index",
-        "Get index information for one or more tables (name, columns, uniqueness, type).",
-        { tables: z.string().describe("Comma-separated table names") },
-        async ({ tables }) => {
+        "find_tables",
+        "Search for tables by comment/description keyword. Returns matching table names and their comments.",
+        { keyword: z.string().describe("Keyword to search in table comments") },
+        async ({ keyword }) => {
             try {
                 const pool = getPool();
-                const tableNames = tables
-                    .split(",")
-                    .map((t) => t.trim())
-                    .filter(Boolean);
-                const placeholders = tableNames.map(() => "?").join(",");
-
                 const [rows] = await pool.query(
-                    `SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME, SEQ_IN_INDEX, NON_UNIQUE, INDEX_TYPE, NULLABLE
-           FROM information_schema.STATISTICS
-           WHERE TABLE_SCHEMA = ? AND TABLE_NAME IN (${placeholders})
-           ORDER BY TABLE_NAME, INDEX_NAME, SEQ_IN_INDEX`,
-                    [config.db.database, ...tableNames],
+                    `SELECT TABLE_SCHEMA, TABLE_NAME, TABLE_COMMENT
+           FROM information_schema.TABLES
+           WHERE TABLE_SCHEMA = ? AND TABLE_COMMENT LIKE ?
+           ORDER BY TABLE_NAME`,
+                    [config.db.database, `%${keyword}%`],
                 );
 
                 return {

@@ -2,12 +2,12 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { AppConfig } from "../config/index.js";
 import { getPool } from "../db/pool.js";
 
-export function registerGetDbHealthIndexUsage(
+export function registerAnalyzeIndexUsage(
     server: McpServer,
     config: AppConfig,
 ): void {
     server.tool(
-        "get_db_health_index_usage",
+        "analyze_index_usage",
         "Analyze index performance: find redundant, unused, and poorly-performing indexes.",
         {},
         async () => {
@@ -15,7 +15,6 @@ export function registerGetDbHealthIndexUsage(
                 const pool = getPool();
                 const diagnostics: Record<string, unknown> = {};
 
-                // Redundant indexes (never used)
                 try {
                     const [redundant] = await pool.query(
                         `SELECT object_schema, object_name, index_name, count_star
@@ -30,7 +29,6 @@ export function registerGetDbHealthIndexUsage(
                         "Requires performance_schema enabled";
                 }
 
-                // Slow indexes (high wait time)
                 try {
                     const [slow] = await pool.query(
                         `SELECT object_schema, object_name, index_name, count_star,
@@ -48,7 +46,6 @@ export function registerGetDbHealthIndexUsage(
                         "Requires performance_schema enabled";
                 }
 
-                // Tables with no indexes being used
                 try {
                     const [unused] = await pool.query(
                         `SELECT object_schema, object_name,

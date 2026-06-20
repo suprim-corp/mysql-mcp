@@ -4,12 +4,12 @@ import type { AppConfig } from "../config/index.js";
 import type { RowDataPacket } from "mysql2/promise";
 import { getPool } from "../db/pool.js";
 
-export function registerOptimizeSql(
+export function registerExplainQuery(
     server: McpServer,
     config: AppConfig,
 ): void {
     server.tool(
-        "optimize_sql",
+        "explain_query",
         "Analyze a SQL query for optimization. Returns the EXPLAIN plan, relevant table schemas, indexes, and row counts to help identify performance issues.",
         { sql: z.string().describe("The SQL query to analyze") },
         async ({ sql }) => {
@@ -17,17 +17,14 @@ export function registerOptimizeSql(
                 const pool = getPool();
                 const analysis: Record<string, unknown> = {};
 
-                // Get EXPLAIN plan
                 const [explainResult] = await pool.query(`EXPLAIN ${sql}`);
                 analysis.explainPlan = explainResult;
 
-                // Extract table names from the query
                 const tableNames = extractTableNames(sql);
 
                 if (tableNames.length > 0) {
                     const placeholders = tableNames.map(() => "?").join(",");
 
-                    // Table row counts
                     const [tableSizes] = await pool.query<RowDataPacket[]>(
                         `SELECT TABLE_NAME, TABLE_ROWS, DATA_LENGTH, INDEX_LENGTH,
                     ROUND((DATA_LENGTH + INDEX_LENGTH) / 1024 / 1024, 2) AS total_size_mb
@@ -37,7 +34,6 @@ export function registerOptimizeSql(
                     );
                     analysis.tableSizes = tableSizes;
 
-                    // Table indexes
                     const [indexes] = await pool.query(
                         `SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME, SEQ_IN_INDEX, NON_UNIQUE, INDEX_TYPE
              FROM information_schema.STATISTICS
@@ -47,7 +43,6 @@ export function registerOptimizeSql(
                     );
                     analysis.indexes = indexes;
 
-                    // Table columns
                     const [columns] = await pool.query(
                         `SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE, COLUMN_KEY
              FROM information_schema.COLUMNS
@@ -59,8 +54,6 @@ export function registerOptimizeSql(
                 }
 
                 analysis.originalSql = sql;
-                analysis.instructions =
-                    "Use the EXPLAIN plan, table sizes, indexes, and column info above to identify performance issues and suggest optimizations.";
 
                 return {
                     content: [
@@ -135,7 +128,6 @@ function extractTableNames(sql: string): string[] {
 
     const tables = new Set<string>();
 
-    // Match FROM and JOIN clauses
     const pattern = /\b(?:FROM|JOIN)\s+(\w+)/gi;
     let match: RegExpExecArray | null;
     while ((match = pattern.exec(cleaned)) !== null) {

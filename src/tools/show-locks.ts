@@ -2,12 +2,12 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { AppConfig } from "../config/index.js";
 import { getPool } from "../db/pool.js";
 
-export function registerGetTableLock(
+export function registerShowLocks(
     server: McpServer,
     _config: AppConfig,
 ): void {
     server.tool(
-        "get_table_lock",
+        "show_locks",
         "Diagnose current table and row-level locks. Supports both MySQL 5.x and 8.x.",
         {},
         async () => {
@@ -20,7 +20,6 @@ export function registerGetTableLock(
                 );
                 diagnostics.openTablesInUse = openTables;
 
-                // MySQL 8+ lock diagnostics
                 try {
                     const [lockWaits] = await pool.query(
                         `SELECT
@@ -36,7 +35,6 @@ export function registerGetTableLock(
                     );
                     diagnostics.lockWaits = lockWaits;
                 } catch {
-                    // MySQL 5.x fallback
                     try {
                         const [lockWaits] = await pool.query(
                             `SELECT

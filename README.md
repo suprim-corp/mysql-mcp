@@ -59,16 +59,27 @@ Add to your `claude_desktop_config.json`:
 
 ## Tools
 
-| Tool                        | Description                                                |
-|-----------------------------|------------------------------------------------------------|
-| `execute_sql`               | Execute SQL queries with role-based permission enforcement |
-| `get_table_name`            | Search tables by comment/description keyword               |
-| `get_table_desc`            | Get column structure for tables                            |
-| `get_table_index`           | Get index information for tables                           |
-| `get_table_lock`            | Diagnose current table and row-level locks                 |
-| `get_db_health_running`     | Database health snapshot (processes, InnoDB, transactions) |
-| `get_db_health_index_usage` | Find redundant, unused, and slow indexes                   |
-| `optimize_sql`              | Analyze a query with EXPLAIN plan and table metadata       |
+### SQL Execution (role-gated)
+
+| Tool             | Role Required | Description                                                       |
+|------------------|---------------|-------------------------------------------------------------------|
+| `query`          | all           | Read-only SQL (SELECT, SHOW, DESCRIBE, EXPLAIN). Default 1000 row limit. |
+| `mutate`         | writer+       | Data modifications (INSERT, UPDATE, DELETE). Transaction-wrapped. Supports dry_run. |
+| `admin_execute`  | admin         | DDL statements (CREATE, ALTER, DROP, TRUNCATE). Supports dry_run. |
+
+Tools are conditionally registered — if your role is `readonly`, `mutate` and `admin_execute` won't appear.
+
+### Diagnostics (always available)
+
+| Tool                  | Description                                                |
+|-----------------------|------------------------------------------------------------|
+| `find_tables`         | Search tables by comment/description keyword               |
+| `describe_tables`     | Get column structure for tables                            |
+| `describe_indexes`    | Get index information for tables                           |
+| `show_locks`          | Diagnose current table and row-level locks                 |
+| `show_processes`      | Database health snapshot (processes, InnoDB, transactions)  |
+| `analyze_index_usage` | Find redundant, unused, and slow indexes                   |
+| `explain_query`       | Analyze a query with EXPLAIN plan and table metadata       |
 
 ## CLI Options
 

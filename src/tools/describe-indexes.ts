@@ -3,13 +3,13 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { AppConfig } from "../config/index.js";
 import { getPool } from "../db/pool.js";
 
-export function registerGetTableDesc(
+export function registerDescribeIndexes(
     server: McpServer,
     config: AppConfig,
 ): void {
     server.tool(
-        "get_table_desc",
-        "Get column structure for one or more tables (name, type, nullable, default, comment).",
+        "describe_indexes",
+        "Get index information for one or more tables (name, columns, uniqueness, type).",
         { tables: z.string().describe("Comma-separated table names") },
         async ({ tables }) => {
             try {
@@ -21,10 +21,10 @@ export function registerGetTableDesc(
                 const placeholders = tableNames.map(() => "?").join(",");
 
                 const [rows] = await pool.query(
-                    `SELECT TABLE_NAME, COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, COLUMN_COMMENT, ORDINAL_POSITION
-           FROM information_schema.COLUMNS
+                    `SELECT TABLE_NAME, INDEX_NAME, COLUMN_NAME, SEQ_IN_INDEX, NON_UNIQUE, INDEX_TYPE, NULLABLE
+           FROM information_schema.STATISTICS
            WHERE TABLE_SCHEMA = ? AND TABLE_NAME IN (${placeholders})
-           ORDER BY TABLE_NAME, ORDINAL_POSITION`,
+           ORDER BY TABLE_NAME, INDEX_NAME, SEQ_IN_INDEX`,
                     [config.db.database, ...tableNames],
                 );
 

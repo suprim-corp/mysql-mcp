@@ -2,12 +2,12 @@ import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { AppConfig } from "../config/index.js";
 import { getPool } from "../db/pool.js";
 
-export function registerGetDbHealthRunning(
+export function registerShowProcesses(
     server: McpServer,
     _config: AppConfig,
 ): void {
     server.tool(
-        "get_db_health_running",
+        "show_processes",
         "Get a database health snapshot: active processes, InnoDB status, running transactions, and connection limits.",
         {},
         async () => {

@@ -1,6 +1,6 @@
 {
 	"name": "@suprim/mysql-mcp",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"description": "MySQL MCP server for AI assistants - execute queries, inspect schema, diagnose performance",
 	"license": "MIT",
 	"type": "module",

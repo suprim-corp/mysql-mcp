@@ -68,3 +68,16 @@ export function checkPermissions(sql: string, role: Role): void {
         );
     }
 }
+
+export function validateAllowedOps(
+    sql: string,
+    allowed: Set<SqlOperation>,
+): void {
+    const found = extractOperations(sql);
+    const unauthorized = [...found].filter((op) => !allowed.has(op));
+    if (unauthorized.length > 0) {
+        throw new Error(
+            `This tool only supports: ${[...allowed].join(", ")}. Found unauthorized: ${unauthorized.join(", ")}`,
+        );
+    }
+}
