@@ -1,35 +1,43 @@
 {
-    "name": "mysql-mcp",
-    "version": "0.1.0",
-    "description": "MySQL MCP server for AI assistants - execute queries, inspect schema, diagnose performance",
-    "license": "MIT",
-    "type": "module",
-    "bin": {
-        "mysql-mcp": "./dist/index.js"
-    },
-    "main": "./dist/server.js",
-    "files": ["dist"],
-    "scripts": {
-        "build": "tsup",
-        "dev": "tsx src/index.ts",
-        "prepublishOnly": "npm run build"
-    },
-    "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.12.0",
-        "commander": "^13.1.0",
-        "dotenv": "^16.5.0",
-        "mysql2": "^3.12.0",
-        "zod": "^3.24.0"
-    },
-    "devDependencies": {
-        "@biomejs/biome": "1.9.4",
-        "@types/node": "^22.0.0",
-        "tsup": "^8.5.0",
-        "tsx": "^4.19.0",
-        "typescript": "^5.8.0"
-    },
-    "engines": {
-        "node": ">=18.0.0"
-    },
-    "keywords": ["mcp", "mysql", "database", "ai", "claude"]
+	"name": "@suprim/mysql-mcp",
+	"version": "0.1.0",
+	"description": "MySQL MCP server for AI assistants - execute queries, inspect schema, diagnose performance",
+	"license": "MIT",
+	"type": "module",
+	"bin": {
+		"mysql-mcp": "./dist/index.js"
+	},
+	"main": "./dist/server.js",
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsup",
+		"dev": "tsx src/index.ts",
+		"prepublishOnly": "bun run build"
+	},
+	"dependencies": {
+		"@modelcontextprotocol/sdk": "^1.12.0",
+		"commander": "^13.1.0",
+		"dotenv": "^16.5.0",
+		"mysql2": "^3.12.0",
+		"zod": "^3.24.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.9.4",
+		"@types/node": "^22.0.0",
+		"tsup": "^8.5.0",
+		"tsx": "^4.19.0",
+		"typescript": "^5.8.0"
+	},
+	"engines": {
+		"node": ">=18.0.0"
+	},
+	"keywords": [
+		"mcp",
+		"mysql",
+		"database",
+		"ai",
+		"claude"
+	]
 }

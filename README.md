@@ -14,7 +14,7 @@ analyze performance — all through a standard MCP interface.
 ## Quick Start
 
 ```bash
-npx mysql-mcp --host localhost --user root --password secret --database mydb
+npx @suprim/mysql-mcp --host localhost --user root --password secret --database mydb
 ```
 
 Or with environment variables:
@@ -24,7 +24,7 @@ export MYSQL_HOST=localhost
 export MYSQL_USER=root
 export MYSQL_PASSWORD=secret
 export MYSQL_DATABASE=mydb
-npx mysql-mcp
+npx @suprim/mysql-mcp
 ```
 
 ## Claude Desktop Configuration
@@ -37,7 +37,7 @@ Add to your `claude_desktop_config.json`:
 		"mysql": {
 			"command": "npx",
 			"args": [
-				"mysql-mcp"
+				"@suprim/mysql-mcp"
 			],
 			"env": {
 				"MYSQL_HOST": "localhost",
